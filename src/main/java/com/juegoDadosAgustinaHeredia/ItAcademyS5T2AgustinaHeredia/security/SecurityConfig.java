@@ -17,8 +17,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
 
 @Configuration
@@ -69,36 +67,5 @@ public class SecurityConfig {
     public  JWTAuthenticationFilter jwtAuthenticationFilter() {
         return new JWTAuthenticationFilter();
     }
-    @Override
-    public void configure(WebSecurity web) throws Exception {
-        web.ignoring()
-                .antMatchers("/login.html"); // Permite el acceso público a /login.html
-    }
-
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http
-            .csrf().disable()
-            .exceptionHandling()
-            .authenticationEntryPoint(authEntryPoint)
-            .and()
-            .sessionManagement()
-            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and()
-            .authorizeRequests()
-            .requestMatchers("/api/auth/**").permitAll()
-            .antMatchers("/home").authenticated() // Protege la página de inicio después del inicio de sesión
-            .anyRequest().authenticated()
-            .and()
-            .formLogin()
-            .loginPage("/login.html") // Ruta del formulario de inicio de sesión
-            .loginProcessingUrl("/perform_login") // Ruta para enviar el formulario de inicio de sesión
-            .defaultSuccessUrl("/home") // Ruta de redirección después del inicio de sesión exitoso
-            .failureUrl("/login.html?error=true") // Ruta de redirección después de un inicio de sesión fallido
-            .permitAll()
-            .and()
-            .httpBasic();
-        
-        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
-    }
+    
 }
